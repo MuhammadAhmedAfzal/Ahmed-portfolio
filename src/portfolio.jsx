@@ -712,7 +712,7 @@ export default function Portfolio() {
                   borderRightColor: "#c8a96e44",
                 }} />
                 <img
-                  src="https://github.com/MuhammadAhmedAfzal/Ahmed-portfolio/blob/main/ahmed_profile.png"
+                  src="/ahmed_portfolio.png"
                   alt="Muhammad Ahmed"
                   style={{
                     width: 220,
