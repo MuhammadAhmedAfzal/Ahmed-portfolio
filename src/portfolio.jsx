@@ -239,6 +239,11 @@ export default function Portfolio() {
           50% { transform: translateY(-12px) rotate(1deg); }
         }
 
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to   { transform: rotate(360deg); }
+        }
+
         @keyframes pulse-ring {
           0% { transform: scale(1); opacity: 0.6; }
           100% { transform: scale(1.4); opacity: 0; }
@@ -684,6 +689,78 @@ export default function Portfolio() {
                   VIEW WORK ↓
                 </button>
               </div>
+            </div>
+
+            {/* Photo + Stats panel */}
+            <div style={{ flex: "0 1 300px", display: "flex", flexDirection: "column", alignItems: "center", gap: 0, animation: "float 6s ease-in-out infinite" }}>
+
+              {/* Profile Photo */}
+              <div style={{ position: "relative", marginBottom: 0 }}>
+                {/* Decorative ring */}
+                <div style={{
+                  position: "absolute", inset: -6,
+                  borderRadius: "50%",
+                  border: "1.5px dashed #c8a96e55",
+                  animation: "spin 20s linear infinite",
+                }} />
+                {/* Gold arc accent */}
+                <div style={{
+                  position: "absolute", inset: -3,
+                  borderRadius: "50%",
+                  border: "3px solid transparent",
+                  borderTopColor: "#c8a96e",
+                  borderRightColor: "#c8a96e44",
+                }} />
+                <img
+                  src="./ahmed_profile.png"
+                  alt="Muhammad Ahmed"
+                  style={{
+                    width: 220,
+                    height: 220,
+                    borderRadius: "50%",
+                    objectFit: "cover",
+                    objectPosition: "top",
+                    display: "block",
+                    border: "4px solid #1e1e28",
+                    boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 0 1px #c8a96e22",
+                  }}
+                />
+                {/* Available badge on photo */}
+                <div style={{
+                  position: "absolute", bottom: 10, right: -8,
+                  background: "#0e0e16",
+                  border: "1px solid #1e1e28",
+                  borderRadius: 100,
+                  padding: "5px 12px",
+                  display: "flex", alignItems: "center", gap: 6,
+                  boxShadow: "0 4px 20px rgba(0,0,0,0.4)",
+                }}>
+                  <div className="glow-dot" style={{ width: 6, height: 6 }} />
+                  <span style={{ fontSize: 10, color: "#9a968f", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>OPEN TO WORK</span>
+                </div>
+              </div>
+
+              {/* Stats below photo */}
+              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 2, marginTop: 24 }}>
+                {[
+                  { n: "4+", label: "Years Experience" },
+                  { n: "30%", label: "Performance Boost" },
+                  { n: "2", label: "Companies" },
+                  { n: "🏆", label: "Rising Star Award" },
+                ].map((s, i) => (
+                  <div key={i} style={{
+                    background: i % 2 === 0 ? "#0e0e16" : "#12121a",
+                    border: "1px solid #1e1e28",
+                    borderRadius: i === 0 ? "12px 12px 0 0" : i === 3 ? "0 0 12px 12px" : 0,
+                    padding: "18px 24px",
+                    display: "flex", alignItems: "center", justifyContent: "space-between",
+                  }}>
+                    <span style={{ fontFamily: "'Instrument Serif', serif", fontSize: 34, color: "#c8a96e", lineHeight: 1 }}>{s.n}</span>
+                    <span style={{ fontSize: 11, color: "#6a6860", letterSpacing: "0.1em", textAlign: "right", maxWidth: 120 }}>{s.label.toUpperCase()}</span>
+                  </div>
+                ))}
+              </div>
+
             </div>
 
             {/* Stats panel */}
