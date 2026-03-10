@@ -128,6 +128,65 @@ export default function Portfolio() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [hoveredSkill, setHoveredSkill] = useState(null);
   const [copiedEmail, setCopiedEmail] = useState(false);
+  const [showModal, setShowModal] = useState(false);
+  const [formStep, setFormStep] = useState(1);
+  const [submitStatus, setSubmitStatus] = useState(null); // null | 'sending' | 'success' | 'error'
+  const [form, setForm] = useState({
+    name: "", email: "", company: "", phone: "",
+    projectType: "", budget: "", timeline: "", message: "",
+  });
+
+  const projectTypes = [
+    { icon: "🌐", label: "Full-Stack Web App" },
+    { icon: "☁️", label: "AWS Cloud Solution" },
+    { icon: "🔐", label: "Auth / Security" },
+    { icon: "⚡", label: "Microservices / API" },
+    { icon: "🗄️", label: "Database Design" },
+    { icon: "🚀", label: "CI/CD Pipeline" },
+  ];
+
+  const budgets = ["< $500", "$500–$2k", "$2k–$5k", "$5k–$10k", "$10k+", "Let's discuss"];
+  const timelines = ["ASAP", "1 month", "2–3 months", "3–6 months", "Flexible"];
+
+  const openModal = () => { setShowModal(true); setFormStep(1); setSubmitStatus(null); document.body.style.overflow = "hidden"; };
+  const closeModal = () => { setShowModal(false); setFormStep(1); setSubmitStatus(null); setForm({ name: "", email: "", company: "", phone: "", projectType: "", budget: "", timeline: "", message: "" }); document.body.style.overflow = ""; };
+
+  const handleField = (key, val) => setForm(f => ({ ...f, [key]: val }));
+
+  const sendEmail = async () => {
+    setSubmitStatus("sending");
+    // Using EmailJS free tier — replace these IDs after setting up at emailjs.com
+    const EMAILJS_SERVICE_ID = "service_jq3m4q5";
+    const EMAILJS_TEMPLATE_ID = "template_bu4w4ha";
+    const EMAILJS_PUBLIC_KEY = "1QhAhtbt7wvxlIWZq";
+
+    try {
+      const res = await fetch("https://api.emailjs.com/api/v1.0/email/send", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          service_id: EMAILJS_SERVICE_ID,
+          template_id: EMAILJS_TEMPLATE_ID,
+          user_id: EMAILJS_PUBLIC_KEY,
+          template_params: {
+            from_name: form.name,
+            from_email: form.email,
+            company: form.company || "N/A",
+            phone: form.phone || "N/A",
+            project_type: form.projectType,
+            budget: form.budget,
+            timeline: form.timeline,
+            message: form.message,
+            to_email: "ahmedmalikoffice44@gmail.com",
+          },
+        }),
+      });
+      if (res.ok) { setSubmitStatus("success"); }
+      else { setSubmitStatus("error"); }
+    } catch {
+      setSubmitStatus("error");
+    }
+  };
 
   const copyEmail = () => {
     navigator.clipboard.writeText("ahmedmalikoffice44@gmail.com");
@@ -291,9 +350,244 @@ export default function Portfolio() {
           .hide-mobile { display: none !important; }
           .mobile-col { flex-direction: column !important; }
         }
+
+        /* MODAL */
+        @keyframes modalIn {
+          from { opacity: 0; transform: scale(0.94) translateY(20px); }
+          to   { opacity: 1; transform: scale(1) translateY(0); }
+        }
+        @keyframes overlayIn {
+          from { opacity: 0; }
+          to   { opacity: 1; }
+        }
+        .modal-overlay {
+          position: fixed; inset: 0; z-index: 9000;
+          background: rgba(5,5,10,0.85);
+          backdrop-filter: blur(12px);
+          display: flex; align-items: center; justify-content: center;
+          padding: 20px;
+          animation: overlayIn 0.3s ease;
+        }
+        .modal-box {
+          background: #0e0e18;
+          border: 1px solid #2a2a38;
+          border-radius: 20px;
+          width: 100%; max-width: 580px;
+          max-height: 90vh;
+          overflow-y: auto;
+          animation: modalIn 0.4s cubic-bezier(.16,1,.3,1);
+          position: relative;
+        }
+        .modal-box::-webkit-scrollbar { width: 3px; }
+        .modal-box::-webkit-scrollbar-thumb { background: #c8a96e55; border-radius: 2px; }
+
+        .form-input {
+          width: 100%;
+          background: #0a0a12;
+          border: 1px solid #2a2a38;
+          border-radius: 10px;
+          padding: 14px 16px;
+          color: #e8e4dc;
+          font-family: 'DM Sans', sans-serif;
+          font-size: 14px;
+          outline: none;
+          transition: border-color 0.3s, box-shadow 0.3s;
+        }
+        .form-input:focus { border-color: #c8a96e; box-shadow: 0 0 0 3px #c8a96e18; }
+        .form-input::placeholder { color: #4a4840; }
+
+        .option-chip {
+          padding: 10px 16px;
+          border-radius: 8px;
+          border: 1px solid #2a2a38;
+          background: #0a0a12;
+          color: #9a968f;
+          font-size: 12px;
+          letter-spacing: 0.04em;
+          cursor: pointer;
+          transition: all 0.25s;
+          display: flex; align-items: center; gap: 6px;
+          font-family: 'DM Sans', sans-serif;
+          white-space: nowrap;
+        }
+        .option-chip:hover { border-color: #c8a96e88; color: #e8e4dc; }
+        .option-chip.selected { border-color: #c8a96e; background: #c8a96e18; color: #c8a96e; }
+
+        .step-dot {
+          width: 8px; height: 8px; border-radius: 50%;
+          background: #2a2a38;
+          transition: all 0.3s;
+        }
+        .step-dot.active { background: #c8a96e; width: 24px; border-radius: 4px; }
+        .step-dot.done { background: #c8a96e88; }
+
+        @keyframes checkPop { 0% { transform: scale(0); } 70% { transform: scale(1.2); } 100% { transform: scale(1); } }
+        .check-anim { animation: checkPop 0.5s cubic-bezier(.16,1,.3,1) forwards; }
       `}</style>
 
       <div className="grain" />
+
+      {/* HIRE ME MODAL */}
+      {showModal && (
+        <div className="modal-overlay" onClick={e => { if (e.target === e.currentTarget) closeModal(); }}>
+          <div className="modal-box">
+
+            {/* Modal Header */}
+            <div style={{ padding: "32px 36px 24px", borderBottom: "1px solid #1e1e28", display: "flex", justifyContent: "space-between", alignItems: "flex-start" }}>
+              <div>
+                <p style={{ fontSize: 10, letterSpacing: "0.22em", color: "#c8a96e", marginBottom: 6 }}>LET'S WORK TOGETHER</p>
+                <h2 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 28, letterSpacing: "-0.01em", lineHeight: 1.2 }}>
+                  {submitStatus === "success" ? "Request Sent!" : "Setup a Meeting"}
+                </h2>
+              </div>
+              <button onClick={closeModal} style={{ background: "#1a1a24", border: "1px solid #2a2a38", borderRadius: 8, width: 36, height: 36, cursor: "pointer", color: "#9a968f", fontSize: 16, display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0, marginLeft: 16 }}>✕</button>
+            </div>
+
+            {/* Step indicators */}
+            {submitStatus !== "success" && (
+              <div style={{ padding: "20px 36px 0", display: "flex", gap: 6, alignItems: "center" }}>
+                {[1, 2, 3].map(s => (
+                  <div key={s} className={`step-dot ${formStep === s ? "active" : formStep > s ? "done" : ""}`} />
+                ))}
+                <span style={{ fontSize: 11, color: "#5a5850", marginLeft: 8, letterSpacing: "0.1em" }}>
+                  STEP {formStep} OF 3
+                </span>
+              </div>
+            )}
+
+            <div style={{ padding: "28px 36px 36px" }}>
+
+              {/* SUCCESS STATE */}
+              {submitStatus === "success" && (
+                <div style={{ textAlign: "center", padding: "20px 0 10px" }}>
+                  <div className="check-anim" style={{ width: 72, height: 72, borderRadius: "50%", background: "#c8a96e18", border: "2px solid #c8a96e", display: "flex", alignItems: "center", justifyContent: "center", fontSize: 30, margin: "0 auto 24px" }}>✓</div>
+                  <h3 style={{ fontFamily: "'Instrument Serif', serif", fontSize: 22, marginBottom: 12 }}>Message Received!</h3>
+                  <p style={{ color: "#7a7870", fontSize: 14, lineHeight: 1.8, marginBottom: 28 }}>
+                    Thanks <strong style={{ color: "#e8e4dc" }}>{form.name}</strong>! I'll review your project details and get back to you at <strong style={{ color: "#c8a96e" }}>{form.email} - {form.phone}</strong> within 24 hours.
+                  </p>
+                  <div style={{ background: "#0a0a12", border: "1px solid #1e1e28", borderRadius: 12, padding: "16px 20px", textAlign: "left", marginBottom: 28 }}>
+                    {[["Project", form.projectType], ["Budget", form.budget], ["Timeline", form.timeline]].map(([k, v]) => (
+                      <div key={k} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #1a1a22" }}>
+                        <span style={{ fontSize: 11, color: "#5a5850", letterSpacing: "0.1em" }}>{k.toUpperCase()}</span>
+                        <span style={{ fontSize: 12, color: "#c8a96e" }}>{v}</span>
+                      </div>
+                    ))}
+                  </div>
+                  <button className="btn-primary" onClick={closeModal} style={{ padding: "12px 32px", borderRadius: 8, fontSize: 13, letterSpacing: "0.06em" }}>CLOSE</button>
+                </div>
+              )}
+
+              {/* STEP 1 — Personal Info */}
+              {submitStatus !== "success" && formStep === 1 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 8 }}>FULL NAME *</label>
+                      <input className="form-input" placeholder="Muhammad Ahmed" value={form.name} onChange={e => handleField("name", e.target.value)} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 8 }}>EMAIL *</label>
+                      <input className="form-input" type="email" placeholder="you@company.com" value={form.email} onChange={e => handleField("email", e.target.value)} />
+                    </div>
+                  </div>
+                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
+                    <div>
+                      <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 8 }}>COMPANY</label>
+                      <input className="form-input" placeholder="Your Company (optional)" value={form.company} onChange={e => handleField("company", e.target.value)} />
+                    </div>
+                    <div>
+                      <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 8 }}>PHONE</label>
+                      <input className="form-input" placeholder="+92 300 0000000" value={form.phone} onChange={e => handleField("phone", e.target.value)} />
+                    </div>
+                  </div>
+                  <button className="btn-primary" disabled={!form.name || !form.email}
+                    onClick={() => setFormStep(2)}
+                    style={{ padding: "14px", borderRadius: 10, fontSize: 13, letterSpacing: "0.08em", marginTop: 8, opacity: (!form.name || !form.email) ? 0.4 : 1 }}>
+                    NEXT — PROJECT DETAILS →
+                  </button>
+                </div>
+              )}
+
+              {/* STEP 2 — Project Details */}
+              {submitStatus !== "success" && formStep === 2 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
+                  <div>
+                    <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 12 }}>WHAT DO YOU NEED? *</label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {projectTypes.map(pt => (
+                        <button key={pt.label} className={`option-chip ${form.projectType === pt.label ? "selected" : ""}`}
+                          onClick={() => handleField("projectType", pt.label)}>
+                          {pt.icon} {pt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 12 }}>BUDGET RANGE *</label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {budgets.map(b => (
+                        <button key={b} className={`option-chip ${form.budget === b ? "selected" : ""}`} onClick={() => handleField("budget", b)}>{b}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 12 }}>TIMELINE *</label>
+                    <div style={{ display: "flex", flexWrap: "wrap", gap: 8 }}>
+                      {timelines.map(t => (
+                        <button key={t} className={`option-chip ${form.timeline === t ? "selected" : ""}`} onClick={() => handleField("timeline", t)}>{t}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{ display: "flex", gap: 10, marginTop: 4 }}>
+                    <button className="btn-ghost" onClick={() => setFormStep(1)} style={{ padding: "13px 20px", borderRadius: 10, fontSize: 13, flex: "0 0 auto" }}>← BACK</button>
+                    <button className="btn-primary" disabled={!form.projectType || !form.budget || !form.timeline}
+                      onClick={() => setFormStep(3)}
+                      style={{ padding: "13px", borderRadius: 10, fontSize: 13, letterSpacing: "0.08em", flex: 1, opacity: (!form.projectType || !form.budget || !form.timeline) ? 0.4 : 1 }}>
+                      NEXT — YOUR MESSAGE →
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* STEP 3 — Message + Submit */}
+              {submitStatus !== "success" && formStep === 3 && (
+                <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {/* Summary bar */}
+                  <div style={{ background: "#0a0a12", border: "1px solid #1e1e28", borderRadius: 10, padding: "12px 16px", display: "flex", gap: 16, flexWrap: "wrap" }}>
+                    {[form.projectType, form.budget, form.timeline].map((v, i) => (
+                      <span key={i} style={{ fontSize: 11, color: "#c8a96e", background: "#c8a96e12", border: "1px solid #c8a96e30", padding: "3px 10px", borderRadius: 100, letterSpacing: "0.06em" }}>{v}</span>
+                    ))}
+                  </div>
+                  <div>
+                    <label style={{ fontSize: 11, letterSpacing: "0.12em", color: "#6a6860", display: "block", marginBottom: 8 }}>DESCRIBE YOUR PROJECT *</label>
+                    <textarea className="form-input" rows={5}
+                      placeholder="Tell me about your project, goals, any technical requirements, and what success looks like for you..."
+                      value={form.message} onChange={e => handleField("message", e.target.value)}
+                      style={{ resize: "vertical", minHeight: 120 }} />
+                  </div>
+                  {submitStatus === "error" && (
+                    <div style={{ background: "#ff444418", border: "1px solid #ff444444", borderRadius: 8, padding: "12px 16px", fontSize: 13, color: "#ff8888" }}>
+                      ⚠️ Something went wrong. Please email me directly at ahmedmalikoffice44@gmail.com
+                    </div>
+                  )}
+                  <div style={{ display: "flex", gap: 10 }}>
+                    <button className="btn-ghost" onClick={() => setFormStep(2)} style={{ padding: "13px 20px", borderRadius: 10, fontSize: 13, flex: "0 0 auto" }}>← BACK</button>
+                    <button className="btn-primary" disabled={!form.message || submitStatus === "sending"}
+                      onClick={sendEmail}
+                      style={{ padding: "13px", borderRadius: 10, fontSize: 13, letterSpacing: "0.08em", flex: 1, opacity: !form.message ? 0.4 : 1 }}>
+                      {submitStatus === "sending" ? "SENDING..." : "SEND REQUEST 🚀"}
+                    </button>
+                  </div>
+                  <p style={{ fontSize: 11, color: "#4a4840", textAlign: "center", letterSpacing: "0.06em" }}>
+                    🔒 Your details are private and never shared with third parties
+                  </p>
+                </div>
+              )}
+
+            </div>
+          </div>
+        </div>
+      )}
 
       {/* NAV */}
       <nav style={{
@@ -319,9 +613,9 @@ export default function Portfolio() {
               {l.toUpperCase()}
             </span>
           ))}
-          <button className="btn-primary" onClick={copyEmail}
+          <button className="btn-primary" onClick={openModal}
             style={{ padding: "10px 22px", borderRadius: 6, fontSize: 12, letterSpacing: "0.06em" }}>
-            {copiedEmail ? "✓ COPIED" : "HIRE ME"}
+            HIRE ME
           </button>
         </div>
 
@@ -380,9 +674,9 @@ export default function Portfolio() {
 
               {/* CTA row */}
               <div style={{ display: "flex", gap: 16, flexWrap: "wrap" }}>
-                <button className="btn-primary" onClick={copyEmail}
+                <button className="btn-primary" onClick={openModal}
                   style={{ padding: "14px 32px", borderRadius: 8, fontSize: 13, letterSpacing: "0.08em" }}>
-                  {copiedEmail ? "✓ EMAIL COPIED" : "GET IN TOUCH"}
+                  GET IN TOUCH
                 </button>
                 <button className="btn-ghost"
                   onClick={() => document.getElementById("experience")?.scrollIntoView({ behavior: "smooth" })}
@@ -645,9 +939,9 @@ export default function Portfolio() {
                   Let's turn your idea into a <em>live product</em>.
                 </h4>
               </div>
-              <button className="btn-primary" onClick={copyEmail}
+              <button className="btn-primary" onClick={openModal}
                 style={{ padding: "14px 32px", borderRadius: 8, fontSize: 13, letterSpacing: "0.08em", flexShrink: 0 }}>
-                {copiedEmail ? "✓ EMAIL COPIED" : "START A PROJECT →"}
+                START A PROJECT →
               </button>
             </div>
           </AnimatedSection>
@@ -670,9 +964,9 @@ export default function Portfolio() {
             </p>
 
             <div style={{ display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <button className="btn-primary" onClick={copyEmail}
+              <button className="btn-primary" onClick={openModal}
                 style={{ padding: "16px 36px", borderRadius: 8, fontSize: 13, letterSpacing: "0.08em" }}>
-                {copiedEmail ? "✓ COPIED TO CLIPBOARD" : "📋 COPY EMAIL"}
+                📋 SETUP A MEETING
               </button>
               <a href="https://linkedin.com/in/malikahmedafzal" target="_blank" rel="noreferrer"
                 style={{ textDecoration: "none" }}>
