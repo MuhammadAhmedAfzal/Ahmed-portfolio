@@ -691,7 +691,7 @@ export default function Portfolio() {
               </div>
             </div>
 
-            {/* Photo + Stats panel */}
+            /* {/* Photo + Stats panel */}
             <div style={{ flex: "0 1 300px", display: "flex", flexDirection: "column", alignItems: "center", gap: 0, animation: "float 6s ease-in-out infinite" }}>
 
               {/* Profile Photo */}
@@ -738,7 +738,7 @@ export default function Portfolio() {
                   <div className="glow-dot" style={{ width: 6, height: 6 }} />
                   <span style={{ fontSize: 10, color: "#9a968f", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>OPEN TO WORK</span>
                 </div>
-              </div>
+              </div> */
 
               {/* Stats below photo */}
               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 2, marginTop: 24 }}>
