@@ -691,7 +691,7 @@ export default function Portfolio() {
               </div>
             </div>
 
-            {/* Photo + Stats panel */}
+             {/* Photo + Stats panel */}
             <div style={{ flex: "0 1 300px", display: "flex", flexDirection: "column", alignItems: "center", gap: 0, animation: "float 6s ease-in-out infinite" }}>
 
               {/* Profile Photo */}
@@ -712,7 +712,7 @@ export default function Portfolio() {
                   borderRightColor: "#c8a96e44",
                 }} />
                 <img
-                  src="./ahmed_profile.png"
+                  src="https://github.com/MuhammadAhmedAfzal/Ahmed-portfolio/blob/main/ahmed_profile.png"
                   alt="Muhammad Ahmed"
                   style={{
                     width: 220,
@@ -738,10 +738,10 @@ export default function Portfolio() {
                   <div className="glow-dot" style={{ width: 6, height: 6 }} />
                   <span style={{ fontSize: 10, color: "#9a968f", letterSpacing: "0.1em", whiteSpace: "nowrap" }}>OPEN TO WORK</span>
                 </div>
-              </div>
+              </div> 
 
               {/* Stats below photo */}
-              <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 2, marginTop: 24 }}>
+               <div style={{ width: "100%", display: "flex", flexDirection: "column", gap: 2, marginTop: 24 }}>
                 {[
                   { n: "4+", label: "Years Experience" },
                   { n: "30%", label: "Performance Boost" },
@@ -759,7 +759,7 @@ export default function Portfolio() {
                     <span style={{ fontSize: 11, color: "#6a6860", letterSpacing: "0.1em", textAlign: "right", maxWidth: 120 }}>{s.label.toUpperCase()}</span>
                   </div>
                 ))}
-              </div>
+              </div> 
 
             </div>
 
